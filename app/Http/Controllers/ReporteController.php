@@ -146,8 +146,7 @@ class ReporteController extends Controller
             $fecha = DateTime::createFromFormat('!m', $item->mes);
             array_push($mes, $fecha->format('F'));
             array_push($cantidad, $item->cantidad);
-        }
-        ;
+        };
         //dd($mes, $cantidad);
 
         $ventasDia = DB::select("select TO_CHAR(fecha_venta, 'YYYY-MM-DD') as dia, count(*) as cantidad 
@@ -241,7 +240,7 @@ class ReporteController extends Controller
     public function buscador(Request $request)
     {
         //$rutaTecnos = 'http://127.0.0.1:8000/';
-        $rutaTecnos = 'http://mail.tecnoweb.org.bo/inf513/grupo05sc/estetica-definity-laser/public/';
+        $rutaTecnos = 'https://tecnoweb.org.bo/inf513/grupo05sc/proyecto2/public/';
         $search = strtolower($request->input('buscar'));
         $tablas = [
             ['users', 'email', 'usuario'],

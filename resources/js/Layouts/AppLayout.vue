@@ -112,15 +112,13 @@ watch(userEstilo, (nuevoEstilo) => {
 
 onMounted(() => {
   nextTick(() => {
-    // AdminLTE automatically initializes these plugins via event delegation in adminlte.js.
-    // Manual initialization here causes conflicts (double-binding events), leading to issues like menus not closing.
-    /*
     if (window.$) {
       const treeview = window.$('[data-widget="treeview"]');
       treeview.Treeview('init');
       window.$('[data-widget="pushmenu"]').PushMenu('init');
+      // Inicializar ControlSidebar
+      // window.$('[data-widget="control-sidebar"]').ControlSidebar('init');
     }
-    */
   });
 });
 
