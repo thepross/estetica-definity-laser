@@ -86,26 +86,36 @@ class PrivilegioController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
-    {
-        $request->validate([
-            'rol_id' => 'required|exists:roles,id', // Validamos que el rol exista
-            'funcion' => 'required',
+public function store(Request $request)
+{
+    $request->validate([
+        'rol_id' => 'required|exists:roles,id',
+        'funcion' => 'required|string',
+    ]);
+
+    // Evitar duplicados
+    $exists = Privilegio::where('id_rol', $request->rol_id)
+        ->where('funcionalidad', $request->funcion)
+        ->first();
+
+    if ($exists) {
+        return back()->withErrors([
+            'funcion' => 'Este privilegio ya está asignado a este rol.'
         ]);
-
-        $privilegio = new Privilegio();
-        $privilegio->id_rol = $request->rol_id; // Guardamos el ID del rol
-        $privilegio->funcionalidad = $request->funcion;
-        $privilegio->agregar = $request->has('agregar') && $request->agregar !== null;
-        $privilegio->borrar = $request->has('borrar') && $request->borrar !== null;
-        $privilegio->modificar = $request->has('modificar') && $request->modificar !== null;
-        $privilegio->leer = $request->has('leer') && $request->leer !== null;
-        $privilegio->state = 'a';
-        // dd($privilegio);
-        $privilegio->save();
-
-        return to_route('privilegio.index')->with('success', 'Privilegio creado exitosamente.');
     }
+
+    Privilegio::create([
+        'id_rol'        => $request->rol_id,
+        'funcionalidad' => $request->funcion,
+        'agregar'       => $request->boolean('agregar'),
+        'borrar'        => $request->boolean('borrar'),
+        'modificar'     => $request->boolean('modificar'),
+        'leer'          => $request->boolean('leer'),
+        'state'         => 'a',
+    ]);
+
+    return back()->with('success', 'Privilegio creado correctamente.');
+}
 
     /**
      * Display the specified resource.
@@ -126,25 +136,33 @@ class PrivilegioController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, Privilegio $privilegio)
-    {
-        $request->validate([
-            'rol_id' => 'required|exists:roles,id', // Validamos que el rol exista
-            'funcion' => 'required',
-            'estado' => 'required|in:a,i',
-        ]);
+public function update(Request $request, Role $rol)
+{
+    // Validamos formato
+    $request->validate([
+        'privilegios' => 'required|array',
+        'privilegios.*.id' => 'required|exists:privilegios,id',
+        'privilegios.*.agregar' => 'boolean',
+        'privilegios.*.borrar' => 'boolean',
+        'privilegios.*.modificar' => 'boolean',
+        'privilegios.*.leer' => 'boolean',
+        'privilegios.*.funcionalidad' => 'string'
+    ]);
 
-        $privilegio->id_rol = $request->rol_id; // Actualizamos el ID del rol
-        $privilegio->funcionalidad = $request->funcion;
-        $privilegio->agregar = $request->has('agregar');
-        $privilegio->borrar = $request->has('borrar');
-        $privilegio->modificar = $request->has('modificar');
-        $privilegio->leer = $request->has('leer');
-        $privilegio->state = $request->estado;
-        $privilegio->save();
+    foreach ($request->privilegios as $data) {
+        $priv = Privilegio::find($data['id']);
 
-        return to_route('privilegio.index')->with('success', 'Privilegio actualizado exitosamente.');
+        // IMPORTANTE: convertir a booleanos reales (porque Vue manda true/false como boolean)
+        $priv->agregar   = (bool) $data['agregar'];
+        $priv->borrar    = (bool) $data['borrar'];
+        $priv->modificar = (bool) $data['modificar'];
+        $priv->leer      = (bool) $data['leer'];
+
+        $priv->save();
     }
+
+    return back()->with('success', 'Privilegios actualizados correctamente.');
+}
 
     /**
      * Remove the specified resource from storage.

@@ -52,7 +52,7 @@ const handleRegister = () => {
                 <div class="text-center mb-2">
                     <a class="navbar-brand" style="text-decoration: none; color: var(--primary-color);" href="#"><i
                             class="fa fa-star text-cyan"></i>
-                        LUMIERE</a>
+                        DEFINITY LASER</a>
                 </div>
                 <!-- Header -->
                 <div class="login-header mb-3">

@@ -29,7 +29,7 @@ const handleLogin = () => {
 
 <template>
 
-    <Head title="LUMIERE" />
+    <Head title="DEFINITY LASER" />
     <AuthLayout>
 
         <div id="app">
@@ -38,7 +38,7 @@ const handleLogin = () => {
                 <!-- Navbar -->
                 <nav class="navbar navbar-expand-lg navbar-light fixed-top">
                     <div class="container">
-                        <a class="navbar-brand" href="#"><i class="fa fa-star text-cyan"></i> LUMIERE</a>
+                        <a class="navbar-brand" href="#"><i class="fa fa-star text-cyan"></i> DEFINITY LASER</a>
                         <button class="navbar-toggler" type="button" data-bs-toggle="collapse"
                             data-bs-target="#navbarNav">
                             <span class="navbar-toggler-icon"></span>
@@ -49,7 +49,7 @@ const handleLogin = () => {
                                 <li class="nav-item"><a class="nav-link" href="#servicios">Tratamientos</a></li>
                                 <li class="nav-item"><a class="nav-link" href="#nosotros">La Clínica</a></li>
                                 <li class="nav-item ms-lg-3">
-                                    <a :href="route('login')" class="btn btn-primary text-white px-4">Área Clientes</a>
+                                    <a :href="route('login')" class="btn btn-primary text-white px-4">Login</a>
                                 </li>
                             </ul>
                         </div>
@@ -133,17 +133,19 @@ const handleLogin = () => {
                         <div class="row">
 
                             <div class="col-md-4 mb-4">
-                                <h4 class="fw-bold mb-3"><i class="fa fa-star text-cyan"></i> LUMIERE</h4>
+                                <h4 class="fw-bold mb-3"><i class="fa fa-star text-cyan"></i> DEFINITY LASER</h4>
                                 <p class="text-white-50 small">Dedicados a realizar tu belleza natural con tecnología
                                     avanzada.</p>
                             </div>
 
                             <div class="col-md-4 mb-4">
                                 <h5 class="mb-3">Contacto</h5>
-                                <p class="text-white-50 small mb-1"><i class="fa fa-map-marker me-2"></i> Av. Reforma
-                                    123
+                                <p class="text-white-50 small mb-1"><i class="fa fa-map-marker me-2"></i> Av. Beni y Av. Los Cusis
                                 </p>
-                                <p class="text-white-50 small"><i class="fa fa-envelope me-2"></i> citas@lumiere.com</p>
+                                <p class="text-white-50 small mb-1"><i class="fa fa-phone me-2"></i> 76669878
+                               
+                                </p>
+                                <p class="text-white-50 small"><i class="fa fa-envelope me-2"></i> https://www.facebook.com/DefinityLaserBo</p>
                             </div>
 
                             <div class="col-md-4 mb-4">
@@ -156,7 +158,7 @@ const handleLogin = () => {
                         <hr class="border-secondary mt-4">
 
                         <div class="text-center text-white-50 small">
-                            &copy; 2023 Lumière Estética. Todos los derechos reservados.
+                            &copy; 2025 Definidy Laser Estética. Todos los derechos reservados.
                         </div>
 
                     </div>

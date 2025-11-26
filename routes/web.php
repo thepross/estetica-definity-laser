@@ -137,6 +137,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/ventas/{cuota}/pagar-cuotas', [PlanPagoController::class, 'pagarCuota2'])->name('planes.pagarCuota2');
     Route::get('/ventas/{venta}/pagar-qr', [PlanPagoController::class, 'pagarQR'])->name('planes.pagarQR');
     Route::post('/privilegios/asignar/{rol}', [PrivilegioController::class, 'asignar'])->name('privilegios.asignar');
+    Route::put('/privilegios/{rol}', [PrivilegioController::class, 'update'])->name('privilegio.update');
+
 });
 
 Route::get('/serviciovue', function () {

@@ -416,7 +416,7 @@ const logout = () => {
     </div>
 
     <footer class="main-footer">
-      <strong>Copyright &copy; 2024 <a href="https://adminlte.io">Netcrow</a>.</strong>
+      <strong>Copyright &copy; 2025 <a href="https://adminlte.io">Tecnoweb</a>.</strong>
       All rights reserved.
       <div class="float-right d-none d-sm-inline-block">
         Visitas: <strong> {{ num }} </strong>

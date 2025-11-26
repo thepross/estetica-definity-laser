@@ -8,6 +8,10 @@ use App\Models\Contador;
 use App\Models\Usuario;
 use App\Models\Venta;
 use App\Models\User;
+use App\Models\Pago;
+use App\Models\Cuota;
+use App\Models\Producto;
+use App\Models\Cliente;
 use DateTime;
 use Inertia\Inertia;
 
@@ -18,51 +22,74 @@ class ReporteController extends Controller
      */
     public function index()
     {
-        $cantidadVentas = DB::table('ventas')
+        // ============================
+        // 1. Cantidad de ventas
+        // ============================
+        $cantidadVentas = Venta::where('state', 'a')->count();
+
+        // ============================
+        // 2. Total realmente recaudado
+        // ============================
+
+        // Pagos individuales
+        $recaudoPagos = Pago::where('state', 'a')
+            ->sum('monto');
+
+        // Cuotas pagadas
+        $recaudoCuotas = Cuota::where('state', 'a')
+            ->where('estado', 'pagado')
+            ->sum('monto');
+
+        $cantidadVendida = $recaudoPagos + $recaudoCuotas;
+
+        // ============================
+        // 3. Cantidad de clientes
+        // ============================
+        $cantidadClientes = Cliente::where('state', 'a')->count();
+
+        // ============================
+        // 4. Cantidad de visitas
+        // ============================
+        $cantidadVisitas = Contador::sum('visitas');
+
+        // ============================
+        // 5. Ventas por mes
+        // ============================
+        $ventasMes = Venta::selectRaw("EXTRACT(MONTH FROM fecha_venta) AS mes, COUNT(*) AS cantidad")
             ->where('state', 'a')
-            ->count();
-
-        $cantidadVendida = DB::table('ventas')
-            ->where('state', 'a')
-            ->sum('total');
-
-        $cantidadClientes = DB::table('clientes')
-            ->where('state', 'a')
-            ->count();
-
-        $cantidadVisitas = DB::table('contadors')
-            ->sum('visitas');
-
-        $ventasMes = DB::select("select date_part('month', fecha_venta) as mes, count(*) as cantidad 
-                                from ventas 
-                                where state='a' 
-                                group by mes 
-                                order by mes asc");
+            ->groupBy('mes')
+            ->orderBy('mes')
+            ->get();
 
         $mes = [];
         $cantidad = [];
+
         foreach ($ventasMes as $item) {
             $fecha = DateTime::createFromFormat('!m', $item->mes);
-            array_push($mes, $fecha->format('F'));
-            array_push($cantidad, $item->cantidad);
+            $mes[] = $fecha->format('F');
+            $cantidad[] = $item->cantidad;
         }
-        ;
-        //dd($mes, $cantidad);
 
-        $ventasDia = DB::select("select TO_CHAR(fecha_venta, 'YYYY-MM-DD') as dia, count(*) as cantidad 
-                                from ventas 
-                                where state='a' 
-                                group by dia 
-                                order by dia asc");
+        // ============================
+        // 6. Ventas por día
+        // ============================
+        $ventasDia = Venta::selectRaw("TO_CHAR(fecha_venta, 'YYYY-MM-DD') AS dia, COUNT(*) AS cantidad")
+            ->where('state', 'a')
+            ->groupBy('dia')
+            ->orderBy('dia')
+            ->get();
 
         $dias = [];
         $cantidadDias = [];
-        foreach ($ventasDia as $item) {
-            array_push($dias, $item->dia);
-            array_push($cantidadDias, $item->cantidad);
-        }
-        //dd($dias, $cantidadDias);
 
+        foreach ($ventasDia as $item) {
+            $dias[] = $item->dia;
+            $cantidadDias[] = $item->cantidad;
+        }
+
+        // ============================
+        // 7. Productos más vendidos
+        // ============================
         $productosTop = DB::select("
             SELECT p.nombre AS producto, SUM(dv.cantidad) AS total_vendido
             FROM productos p
@@ -74,7 +101,9 @@ class ReporteController extends Controller
             LIMIT 5
         ");
 
-        // return view('Reportes.index', compact('cantidadVentas', 'cantidadVendida', 'cantidadClientes', 'cantidadVisitas', 'mes', 'cantidad', 'dias', 'cantidadDias', 'productosTop'));
+        // ============================
+        // RESPUESTA FINAL
+        // ============================
         return Inertia::render('Reportes/Index', [
             'cantidadVentas' => $cantidadVentas,
             'cantidadVendida' => $cantidadVendida,
@@ -86,7 +115,6 @@ class ReporteController extends Controller
             'cantidadDias' => $cantidadDias,
             'productosTop' => $productosTop,
         ]);
-
     }
 
     public function indexVue()
@@ -212,7 +240,8 @@ class ReporteController extends Controller
 
     public function buscador(Request $request)
     {
-        $rutaTecnos = 'http://127.0.0.1:8000/';
+        //$rutaTecnos = 'http://127.0.0.1:8000/';
+        $rutaTecnos = 'http://mail.tecnoweb.org.bo/inf513/grupo05sc/estetica-definity-laser/public/';
         $search = strtolower($request->input('buscar'));
         $tablas = [
             ['users', 'email', 'usuario'],

@@ -87,7 +87,7 @@ onUnmounted(() => {
                             <th>CLIENTE</th>
                             <th>MONTO</th>
                             <th>TIPO PAGO</th>
-                            <th>ESTADO</th>
+                            
                             <th>FECHA</th>
                             <th>ACCIONES</th>
                         </tr>
@@ -98,15 +98,7 @@ onUnmounted(() => {
                             <td>{{ pago.venta?.cliente?.nombre || 'N/A' }}</td>
                             <td>{{ pago.monto }}</td>
                             <td>{{ pago.tipo_pago }}</td>
-                            <td>
-                                <span :class="{
-                                    'badge bg-success': pago.estado_pago === 'pagado',
-                                    'badge bg-warning': pago.estado_pago === 'pendiente',
-                                    'badge bg-danger': pago.estado_pago === 'anulado'
-                                }">
-                                    {{ pago.estado_pago }}
-                                </span>
-                            </td>
+                            
                             <td>{{ new Date(pago.fecha_pago).toLocaleDateString() }}</td>
                             <td>
                                 <a v-if="canEdit" href="#" @click.prevent="
