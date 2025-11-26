@@ -43,7 +43,14 @@ class HandleInertiaRequests extends Middleware
                 'privilegios' => $request->user() ?
                     $request->user()->rol->privilegios
                         ->where('state', 'a')
-                        ->pluck('funcionalidad')
+                        ->mapWithKeys(function ($privilegio) {
+                            return [$privilegio->funcionalidad => [
+                                'leer' => $privilegio->leer,
+                                'agregar' => $privilegio->agregar,
+                                'modificar' => $privilegio->modificar,
+                                'borrar' => $privilegio->borrar,
+                            ]];
+                        })
                         ->toArray()
                     : [],
             ],

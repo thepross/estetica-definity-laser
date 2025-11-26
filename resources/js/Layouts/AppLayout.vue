@@ -14,7 +14,7 @@ const errors = computed(() => page.props.errors);
 const hasErrors = computed(() => Object.keys(page.props.errors).length > 0);
 
 const can = (funcionalidad) => {
-  return page.props.auth.privilegios?.includes(funcionalidad);
+  return page.props.auth.privilegios?.[funcionalidad]?.leer;
 }
 
 
@@ -112,13 +112,15 @@ watch(userEstilo, (nuevoEstilo) => {
 
 onMounted(() => {
   nextTick(() => {
+    // AdminLTE automatically initializes these plugins via event delegation in adminlte.js.
+    // Manual initialization here causes conflicts (double-binding events), leading to issues like menus not closing.
+    /*
     if (window.$) {
       const treeview = window.$('[data-widget="treeview"]');
       treeview.Treeview('init');
       window.$('[data-widget="pushmenu"]').PushMenu('init');
-      // Inicializar ControlSidebar
-      // window.$('[data-widget="control-sidebar"]').ControlSidebar('init');
     }
+    */
   });
 });
 
@@ -232,7 +234,7 @@ const logout = () => {
         <nav class="mt-2">
           <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
 
-            <li class="nav-item" v-if="can('Administracion')">
+            <li class="nav-item" v-if="can('Administracion') || can('Usuario') || can('Rol') || can('Privilegio')">
               <a href="#" class="nav-link">
                 <i class="nav-icon fas fa-copy"></i>
                 <p>

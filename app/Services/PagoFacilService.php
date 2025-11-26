@@ -23,8 +23,8 @@ class PagoFacilService
             'amount' => floatval($venta->total),
             'currency' => 2,
             'clientCode' => "CLIGRUPO005SC-" . $cliente->id,
-            // 'callbackUrl' => route('pagofacil.callback'),
-            'callbackUrl' => "https://tecnoweb.org.bo/inf513/grupo05sc/estetica-definity-laser/public/pagofacil/callback",
+            'callbackUrl' => route('pagofacil.callback'),
+            // 'callbackUrl' => "https://tecnoweb.org.bo/inf513/grupo05sc/proyecto2/public/pagofacil/callback",
             // 'callbackUrl' => config('services.pagofacil.callback_url'),
             'orderDetail' => [
                 [
