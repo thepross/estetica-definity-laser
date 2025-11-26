@@ -144,7 +144,8 @@ const logout = () => {
   <div class="wrapper">
 
     <div class="preloader flex-column justify-content-center align-items-center" v-if="false">
-      <img class="animation__shake" :src="`/dist/img/AdminLTELogo.png`" alt="A" height="60" width="60">
+      <img class="animation__shake" :src="`${page.props.assetUrl}/dist/img/AdminLTELogo.png`" alt="A" height="60"
+        width="60">
     </div>
 
     <nav class="main-header navbar navbar-expand navbar-white navbar-light">
@@ -224,7 +225,8 @@ const logout = () => {
     </nav>
     <aside class="main-sidebar sidebar-dark-primary elevation-4">
       <Link :href="route('dashboard')" class="brand-link" style="text-decoration: none;">
-      <img :src="'/dist/img/AdminLTELogo.png'" alt="A" class="brand-image img-circle elevation-3" style="opacity: .8">
+      <img :src="`${page.props.assetUrl}/dist/img/AdminLTELogo.png`" alt="A" class="brand-image img-circle elevation-3"
+        style="opacity: .8">
       <span class=""><b>Clinica Estetica</b></span>
       </Link>
 

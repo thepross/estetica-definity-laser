@@ -42,20 +42,21 @@ class HandleInertiaRequests extends Middleware
                 'user' => $request->user(),
                 'privilegios' => $request->user() ?
                     $request->user()->rol->privilegios
-                        ->where('state', 'a')
-                        ->mapWithKeys(function ($privilegio) {
-                            return [$privilegio->funcionalidad => [
-                                'leer' => $privilegio->leer,
-                                'agregar' => $privilegio->agregar,
-                                'modificar' => $privilegio->modificar,
-                                'borrar' => $privilegio->borrar,
-                            ]];
-                        })
-                        ->toArray()
+                    ->where('state', 'a')
+                    ->mapWithKeys(function ($privilegio) {
+                        return [$privilegio->funcionalidad => [
+                            'leer' => $privilegio->leer,
+                            'agregar' => $privilegio->agregar,
+                            'modificar' => $privilegio->modificar,
+                            'borrar' => $privilegio->borrar,
+                        ]];
+                    })
+                    ->toArray()
                     : [],
             ],
             // Visitas globales
             'visitas' => $request->session()->get('visitas', 0),
+            'assetUrl' => asset('/'),
 
             'flash' => [
                 'success' => fn() => $request->session()->get('success'),

@@ -2,6 +2,8 @@
 import { ref, computed, onMounted, onUnmounted } from "vue";
 import AppLayout from "@/Layouts/AppLayout.vue";
 import { router, usePage } from "@inertiajs/vue3";
+import NoPermiso from "@/Components/NoPermiso.vue";
+
 
 const props = defineProps({
     pagos: Array,
@@ -17,6 +19,9 @@ function hasPermission(type) {
         (p) => p.funcionalidad === "Pago" && p.state === "a" && p[type] === true
     );
 }
+const can = (funcionalidad) => {
+    return page.props.auth.privilegios?.[funcionalidad]?.leer;
+};
 
 const canEdit = computed(() => hasPermission("modificar"));
 const canDelete = computed(() => hasPermission("borrar"));
@@ -72,101 +77,104 @@ onUnmounted(() => {
 
 <template>
     <AppLayout title="G. Pagos">
-        <div class="card-header d-flex justify-content-between align-items-center">
-            <h1 class="card-title mb-0">
-                <i class="fas fa-money-bill-wave mr-2"></i><b>GESTIONAR PAGOS</b>
-            </h1>
-        </div>
+        <section class="content" v-if="can('Pago')">
+            <div class="card-header d-flex justify-content-between align-items-center">
+                <h1 class="card-title mb-0">
+                    <i class="fas fa-money-bill-wave mr-2"></i><b>GESTIONAR PAGOS</b>
+                </h1>
+            </div>
 
-        <div class="card table-responsive mt-3">
-            <div class="card-body">
-                <table class="table table-hover" id="pagos">
-                    <thead class="table-light">
-                        <tr>
-                            <th>ID</th>
-                            <th>CLIENTE</th>
-                            <th>MONTO</th>
-                            <th>TIPO PAGO</th>
-                            
-                            <th>FECHA</th>
-                            <th>ACCIONES</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="pago in pagos" :key="pago.id">
-                            <td>{{ pago.id }}</td>
-                            <td>{{ pago.venta?.cliente?.nombre || 'N/A' }}</td>
-                            <td>{{ pago.monto }}</td>
-                            <td>{{ pago.tipo_pago }}</td>
-                            
-                            <td>{{ new Date(pago.fecha_pago).toLocaleDateString() }}</td>
-                            <td>
-                                <a v-if="canEdit" href="#" @click.prevent="
-                                    showEdit = pago.id;
+            <div class="card table-responsive mt-3">
+                <div class="card-body">
+                    <table class="table table-hover" id="pagos">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>CLIENTE</th>
+                                <th>MONTO</th>
+                                <th>TIPO PAGO</th>
+
+                                <th>FECHA</th>
+                                <th>ACCIONES</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="pago in pagos" :key="pago.id">
+                                <td>{{ pago.id }}</td>
+                                <td>{{ pago.venta?.cliente?.nombre || 'N/A' }}</td>
+                                <td>{{ pago.monto }}</td>
+                                <td>{{ pago.tipo_pago }}</td>
+
+                                <td>{{ new Date(pago.fecha_pago).toLocaleDateString() }}</td>
+                                <td>
+                                    <a v-if="canEdit" href="#" @click.prevent="
+                                        showEdit = pago.id;
                                     editPago = { ...pago };
-                                ">
-                                    <i class="fa fa-edit"></i>
-                                </a>
-                                &nbsp;
-                                <a v-if="canDelete" href="#" @click.prevent="showDelete = pago">
-                                    <i class="fa fa-trash"></i>
-                                </a>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
+                                    ">
+                                        <i class="fa fa-edit"></i>
+                                    </a>
+                                    &nbsp;
+                                    <a v-if="canDelete" href="#" @click.prevent="showDelete = pago">
+                                        <i class="fa fa-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
             </div>
-        </div>
 
-        <!-- MODAL EDITAR -->
-        <div v-if="showEdit" class="modal-mask">
-            <div class="modal-container">
-                <div class="modal-header d-flex justify-content-between align-items-center">
-                    <h5 class="modal-title">Editar Pago</h5>
-                    <button type="button" class="btn-close" @click="showEdit = null"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="tipo_pago" class="form-label">Tipo de Pago</label>
-                        <select class="form-control" v-model="editPago.tipo_pago">
-                            <option value="Efectivo">Efectivo</option>
-                            <option value="QR">QR</option>
-                            <option value="Transferencia">Transferencia</option>
-                            <option value="Tarjeta">Tarjeta</option>
-                        </select>
+            <!-- MODAL EDITAR -->
+            <div v-if="showEdit" class="modal-mask">
+                <div class="modal-container">
+                    <div class="modal-header d-flex justify-content-between align-items-center">
+                        <h5 class="modal-title">Editar Pago</h5>
+                        <button type="button" class="btn-close" @click="showEdit = null"></button>
                     </div>
-                    <div class="mb-3">
-                        <label for="estado_pago" class="form-label">Estado</label>
-                        <select class="form-control" v-model="editPago.estado_pago">
-                            <option value="pagado">Pagado</option>
-                            <option value="pendiente">Pendiente</option>
-                            <option value="anulado">Anulado</option>
-                        </select>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="tipo_pago" class="form-label">Tipo de Pago</label>
+                            <select class="form-control" v-model="editPago.tipo_pago">
+                                <option value="Efectivo">Efectivo</option>
+                                <option value="QR">QR</option>
+                                <option value="Transferencia">Transferencia</option>
+                                <option value="Tarjeta">Tarjeta</option>
+                            </select>
+                        </div>
+                        <div class="mb-3">
+                            <label for="estado_pago" class="form-label">Estado</label>
+                            <select class="form-control" v-model="editPago.estado_pago">
+                                <option value="pagado">Pagado</option>
+                                <option value="pendiente">Pendiente</option>
+                                <option value="anulado">Anulado</option>
+                            </select>
+                        </div>
                     </div>
-                </div>
-                <div class="text-end mt-3 modal-footer">
-                    <button class="btn btn-secondary" @click="showEdit = null">Cancelar</button>
-                    <button class="btn btn-primary" @click="updatePago">Guardar cambios</button>
+                    <div class="text-end mt-3 modal-footer">
+                        <button class="btn btn-secondary" @click="showEdit = null">Cancelar</button>
+                        <button class="btn btn-primary" @click="updatePago">Guardar cambios</button>
+                    </div>
                 </div>
             </div>
-        </div>
 
-        <!-- MODAL ELIMINAR -->
-        <div v-if="showDelete" class="modal-mask">
-            <div class="modal-container text-center">
-                <div class="modal-header d-flex justify-content-between align-items-center">
-                    <h5 class="modal-title">¿Eliminar Pago?</h5>
-                    <button type="button" class="btn-close" @click="showDelete = null"></button>
-                </div>
-                <div class="modal-body">
-                    <p>¿Estás seguro de que deseas eliminar el pago #<strong>{{ showDelete.id }}</strong>?</p>
-                </div>
-                <div class="modal-footer text-end">
-                    <button class="btn btn-secondary" @click="showDelete = null">Cancelar</button>
-                    <button class="btn btn-danger" @click="deletePago(showDelete.id)">Eliminar</button>
+            <!-- MODAL ELIMINAR -->
+            <div v-if="showDelete" class="modal-mask">
+                <div class="modal-container text-center">
+                    <div class="modal-header d-flex justify-content-between align-items-center">
+                        <h5 class="modal-title">¿Eliminar Pago?</h5>
+                        <button type="button" class="btn-close" @click="showDelete = null"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>¿Estás seguro de que deseas eliminar el pago #<strong>{{ showDelete.id }}</strong>?</p>
+                    </div>
+                    <div class="modal-footer text-end">
+                        <button class="btn btn-secondary" @click="showDelete = null">Cancelar</button>
+                        <button class="btn btn-danger" @click="deletePago(showDelete.id)">Eliminar</button>
+                    </div>
                 </div>
             </div>
-        </div>
+        </section>
+        <NoPermiso v-else mensaje="No tienes permiso para ver los pagos." />
     </AppLayout>
 </template>
 

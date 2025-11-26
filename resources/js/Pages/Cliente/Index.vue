@@ -2,6 +2,7 @@
 import { ref, computed, onMounted, onUnmounted } from "vue";
 import AppLayout from "@/Layouts/AppLayout.vue";
 import { router, usePage } from "@inertiajs/vue3";
+import NoPermiso from "@/Components/NoPermiso.vue";
 
 const props = defineProps({
     clientes: Array,
@@ -17,6 +18,9 @@ function hasPermission(type) {
         (p) => p.funcionalidad === "Cliente" && p.state === "a" && p[type] === true
     );
 }
+const can = (funcionalidad) => {
+    return page.props.auth.privilegios?.[funcionalidad]?.leer;
+};
 
 const canAdd = computed(() => hasPermission("agregar"));
 const canEdit = computed(() => hasPermission("modificar"));
@@ -92,175 +96,179 @@ onUnmounted(() => {
 <template>
     <AppLayout title="G. Cliente">
 
-        <!-- HEADER -->
-        <div class="card-header d-flex justify-content-between align-items-center">
+        <section class="content" v-if="can('Cliente')">
+            <!-- HEADER -->
+            <div class="card-header d-flex justify-content-between align-items-center">
 
-            <h1 class="card-title mb-0">
-                <i class="fas fa-clock mr-2"></i><b>GESTIONAR CLIENTES</b>
-            </h1>
+                <h1 class="card-title mb-0">
+                    <i class="fas fa-clock mr-2"></i><b>GESTIONAR CLIENTES</b>
+                </h1>
 
-            <div class="d-flex align-items-center ml-auto">
-                <button v-if="canAdd" class="btn btn-success" @click="showAdd = true">
-                    <i class="fa fa-plus"></i>&nbsp; Agregar
-                </button>
+                <div class="d-flex align-items-center ml-auto">
+                    <button v-if="canAdd" class="btn btn-success" @click="showAdd = true">
+                        <i class="fa fa-plus"></i>&nbsp; Agregar
+                    </button>
+                </div>
+
             </div>
 
-        </div>
+            <!-- TABLA -->
+            <div class="card table-responsive mt-3">
+                <div class="card-body">
+                    <table class="table table-hover" id="clientes">
+                        <thead class="table-light">
+                            <tr>
+                                <th>ID</th>
+                                <th>NOMBRE</th>
+                                <th>DIRECCIÓN</th>
+                                <th>TELÉFONO</th>
+                                <th>EMAIL</th>
+                                <th>ACCIONES</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr v-for="cliente in clientes" :key="cliente.id">
+                                <td>{{ cliente.id }}</td>
+                                <td>{{ cliente.nombre }}</td>
+                                <td>{{ cliente.direccion }}</td>
+                                <td>{{ cliente.telefono }}</td>
+                                <td>{{ cliente.user.email }}</td>
 
-        <!-- TABLA -->
-        <div class="card table-responsive mt-3">
-            <div class="card-body">
-                <table class="table table-hover" id="clientes">
-                    <thead class="table-light">
-                        <tr>
-                            <th>ID</th>
-                            <th>NOMBRE</th>
-                            <th>DIRECCIÓN</th>
-                            <th>TELÉFONO</th>
-                            <th>EMAIL</th>
-                            <th>ACCIONES</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr v-for="cliente in clientes" :key="cliente.id">
-                            <td>{{ cliente.id }}</td>
-                            <td>{{ cliente.nombre }}</td>
-                            <td>{{ cliente.direccion }}</td>
-                            <td>{{ cliente.telefono }}</td>
-                            <td>{{ cliente.user.email }}</td>
-
-                            <td>
-                                <a v-if="canEdit" href="#" @click.prevent="
-                                    showEdit = cliente.id;
-                                editCliente = { ...cliente };
-                                ">
-                                    <i class="fa fa-edit"></i>
-                                </a>
-                                &nbsp;
-                                <a v-if="canDelete" href="#" @click.prevent="showDelete = cliente">
-                                    <i class="fa fa-trash"></i>
-                                </a>
-                            </td>
-                        </tr>
-                    </tbody>
-                </table>
-            </div>
-        </div>
-
-        <!-- MODAL AGREGAR -->
-        <div v-if="showAdd" class="modal-mask">
-            <div class="modal-container">
-                <div class="modal-header d-flex justify-content-between align-items-center">
-                    <h5 class="modal-title">Agregar Cliente</h5>
-                    <button type="button" class="btn-close" @click="showAdd = false"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="nombre" class="form-label">Nombre</label>
-                        <input class="form-control" v-model="newCliente.nombre" placeholder="Nombre" />
-                        <p v-if="errors.nombre" class="text-danger">{{ errors.nombre }}</p>
-                    </div>
-                    <div class="mb-3">
-                        <label for="direccion" class="form-label">Dirección</label>
-                        <input class="form-control" v-model="newCliente.direccion" placeholder="Dirección" />
-                        <p v-if="errors.direccion" class="text-danger">{{ errors.direccion }}</p>
-                    </div>
-                    <div class="mb-3">
-                        <label for="telefono" class="form-label">Teléfono</label>
-                        <input class="form-control" v-model="newCliente.telefono" placeholder="Teléfono" />
-                        <p v-if="errors.telefono" class="text-danger">{{ errors.telefono }}</p>
-                    </div>
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Email</label>
-                        <input class="form-control" v-model="newCliente.email" placeholder="Email" />
-                        <p v-if="errors.email" class="text-danger">{{ errors.email }}</p>
-                    </div>
-                    <div class="mb-3">
-                        <label for="password" class="form-label">Contraseña</label>
-                        <input type="password" class="form-control" v-model="newCliente.password"
-                            placeholder="Contraseña" />
-                        <p v-if="errors.password" class="text-danger">{{ errors.password }}</p>
-                    </div>
-                </div>
-
-                <div class="text-end mt-3 modal-footer">
-                    <button class="btn btn-secondary" @click="showAdd = false">
-                        Cancelar
-                    </button>
-                    <button class="btn btn-primary" @click="storeCliente">
-                        Guardar
-                    </button>
+                                <td>
+                                    <a v-if="canEdit" href="#" @click.prevent="
+                                        showEdit = cliente.id;
+                                    editCliente = { ...cliente };
+                                    ">
+                                        <i class="fa fa-edit"></i>
+                                    </a>
+                                    &nbsp;
+                                    <a v-if="canDelete" href="#" @click.prevent="showDelete = cliente">
+                                        <i class="fa fa-trash"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
                 </div>
             </div>
-        </div>
 
+            <!-- MODAL AGREGAR -->
+            <div v-if="showAdd" class="modal-mask">
+                <div class="modal-container">
+                    <div class="modal-header d-flex justify-content-between align-items-center">
+                        <h5 class="modal-title">Agregar Cliente</h5>
+                        <button type="button" class="btn-close" @click="showAdd = false"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="nombre" class="form-label">Nombre</label>
+                            <input class="form-control" v-model="newCliente.nombre" placeholder="Nombre" />
+                            <p v-if="errors.nombre" class="text-danger">{{ errors.nombre }}</p>
+                        </div>
+                        <div class="mb-3">
+                            <label for="direccion" class="form-label">Dirección</label>
+                            <input class="form-control" v-model="newCliente.direccion" placeholder="Dirección" />
+                            <p v-if="errors.direccion" class="text-danger">{{ errors.direccion }}</p>
+                        </div>
+                        <div class="mb-3">
+                            <label for="telefono" class="form-label">Teléfono</label>
+                            <input class="form-control" v-model="newCliente.telefono" placeholder="Teléfono" />
+                            <p v-if="errors.telefono" class="text-danger">{{ errors.telefono }}</p>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input class="form-control" v-model="newCliente.email" placeholder="Email" />
+                            <p v-if="errors.email" class="text-danger">{{ errors.email }}</p>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Contraseña</label>
+                            <input type="password" class="form-control" v-model="newCliente.password"
+                                placeholder="Contraseña" />
+                            <p v-if="errors.password" class="text-danger">{{ errors.password }}</p>
+                        </div>
+                    </div>
 
-        <!-- MODAL EDITAR -->
-        <div v-if="showEdit" class="modal-mask">
-            <div class="modal-container">
-                <div class="modal-header d-flex justify-content-between align-items-center">
-                    <h5 class="modal-title">Editar Rol</h5>
-                    <button type="button" class="btn-close" @click="showEdit = null"></button>
-                </div>
-                <div class="modal-body">
-                    <div class="mb-3">
-                        <label for="nombre" class="form-label">Nombre</label>
-                        <input class="form-control" v-model="editCliente.nombre" placeholder="Nombre" />
-                        <p v-if="errors.nombre" class="text-danger">{{ errors.nombre }}</p>
+                    <div class="text-end mt-3 modal-footer">
+                        <button class="btn btn-secondary" @click="showAdd = false">
+                            Cancelar
+                        </button>
+                        <button class="btn btn-primary" @click="storeCliente">
+                            Guardar
+                        </button>
                     </div>
-                    <div class="mb-3">
-                        <label for="direccion" class="form-label">Dirección</label>
-                        <input class="form-control" v-model="editCliente.direccion" placeholder="Dirección" />
-                        <p v-if="errors.direccion" class="text-danger">{{ errors.direccion }}</p>
-                    </div>
-                    <div class="mb-3">
-                        <label for="telefono" class="form-label">Teléfono</label>
-                        <input class="form-control" v-model="editCliente.telefono" placeholder="Teléfono" />
-                        <p v-if="errors.telefono" class="text-danger">{{ errors.telefono }}</p>
-                    </div>
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Email</label>
-                        <input class="form-control" v-model="editCliente.email" placeholder="Email" />
-                        <p v-if="errors.email" class="text-danger">{{ errors.email }}</p>
-                    </div>
-                    <div class="mb-3">
-                        <label for="password" class="form-label">Contraseña</label>
-                        <input type="password" class="form-control" v-model="editCliente.password"
-                            placeholder="Contraseña" />
-                    </div>
-                </div>
-
-                <div class="text-end mt-3 modal-footer">
-                    <button class="btn btn-secondary" @click="showEdit = null">
-                        Cancelar
-                    </button>
-                    <button class="btn btn-primary" @click="updateCliente">
-                        Guardar cambios
-                    </button>
                 </div>
             </div>
-        </div>
 
-        <!-- MODAL ELIMINAR -->
-        <div v-if="showDelete" class="modal-mask">
-            <div class="modal-container text-center">
-                <div class="modal-header d-flex justify-content-between align-items-center">
-                    <h5 class="modal-title">¿Eliminar Cliente?</h5>
-                    <button type="button" class="btn-close" @click="showDelete = null"></button>
-                </div>
-                <div class="modal-body">
-                    <p>¿Estás seguro de que deseas eliminar el cliente <strong>{{ showDelete.nombre }}</strong>?</p>
-                </div>
-                <div class="modal-footer text-end">
-                    <button class="btn btn-secondary" @click="showDelete = null">
-                        Cancelar
-                    </button>
-                    <button class="btn btn-danger" @click="deleteCliente(showDelete)">
-                        Eliminar
-                    </button>
+
+            <!-- MODAL EDITAR -->
+            <div v-if="showEdit" class="modal-mask">
+                <div class="modal-container">
+                    <div class="modal-header d-flex justify-content-between align-items-center">
+                        <h5 class="modal-title">Editar Rol</h5>
+                        <button type="button" class="btn-close" @click="showEdit = null"></button>
+                    </div>
+                    <div class="modal-body">
+                        <div class="mb-3">
+                            <label for="nombre" class="form-label">Nombre</label>
+                            <input class="form-control" v-model="editCliente.nombre" placeholder="Nombre" />
+                            <p v-if="errors.nombre" class="text-danger">{{ errors.nombre }}</p>
+                        </div>
+                        <div class="mb-3">
+                            <label for="direccion" class="form-label">Dirección</label>
+                            <input class="form-control" v-model="editCliente.direccion" placeholder="Dirección" />
+                            <p v-if="errors.direccion" class="text-danger">{{ errors.direccion }}</p>
+                        </div>
+                        <div class="mb-3">
+                            <label for="telefono" class="form-label">Teléfono</label>
+                            <input class="form-control" v-model="editCliente.telefono" placeholder="Teléfono" />
+                            <p v-if="errors.telefono" class="text-danger">{{ errors.telefono }}</p>
+                        </div>
+                        <div class="mb-3">
+                            <label for="email" class="form-label">Email</label>
+                            <input class="form-control" v-model="editCliente.email" placeholder="Email" />
+                            <p v-if="errors.email" class="text-danger">{{ errors.email }}</p>
+                        </div>
+                        <div class="mb-3">
+                            <label for="password" class="form-label">Contraseña</label>
+                            <input type="password" class="form-control" v-model="editCliente.password"
+                                placeholder="Contraseña" />
+                        </div>
+                    </div>
+
+                    <div class="text-end mt-3 modal-footer">
+                        <button class="btn btn-secondary" @click="showEdit = null">
+                            Cancelar
+                        </button>
+                        <button class="btn btn-primary" @click="updateCliente">
+                            Guardar cambios
+                        </button>
+                    </div>
                 </div>
             </div>
-        </div>
+
+            <!-- MODAL ELIMINAR -->
+            <div v-if="showDelete" class="modal-mask">
+                <div class="modal-container text-center">
+                    <div class="modal-header d-flex justify-content-between align-items-center">
+                        <h5 class="modal-title">¿Eliminar Cliente?</h5>
+                        <button type="button" class="btn-close" @click="showDelete = null"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>¿Estás seguro de que deseas eliminar el cliente <strong>{{ showDelete.nombre }}</strong>?</p>
+                    </div>
+                    <div class="modal-footer text-end">
+                        <button class="btn btn-secondary" @click="showDelete = null">
+                            Cancelar
+                        </button>
+                        <button class="btn btn-danger" @click="deleteCliente(showDelete)">
+                            Eliminar
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <NoPermiso v-else mensaje="No tienes permiso para ver los clientes." />
 
     </AppLayout>
 </template>

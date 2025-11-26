@@ -2,6 +2,7 @@
 import { onMounted, ref } from 'vue';
 import AppLayout from '@/Layouts/AppLayout.vue';
 import { Head, usePage } from '@inertiajs/vue3';
+import NoPermiso from '@/Components/NoPermiso.vue';
 
 const props = defineProps({
     cantidadVentas: Number,
@@ -21,8 +22,12 @@ const user = page.props.auth.user;
 const graficoTortaRef = ref(null);
 const graficoTorta2Ref = ref(null);
 
+const can = (funcionalidad) => {
+    return page.props.auth.privilegios?.[funcionalidad]?.leer;
+};
+
 onMounted(() => {
-    if (user.id_rol === 1) {
+    if (can('Reportes')) {
         renderGraficoMes();
         renderGraficoDias();
     }
@@ -80,7 +85,7 @@ const renderGraficoDias = () => {
 
     <AppLayout>
 
-        <section class="content" v-if="user.id_rol === 1">
+        <section class="content" v-if="can('Reportes')">
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-lg-3 col-6">
@@ -184,9 +189,7 @@ const renderGraficoDias = () => {
             </div>
         </section>
 
-        <div v-else class="p-6 bg-white rounded shadow">
-            <p class="text-center text-red-500">No tienes permisos para ver este reporte.</p>
-        </div>
+        <NoPermiso v-else mensaje="No tienes permisos para ver este reporte." />
 
     </AppLayout>
 </template>
