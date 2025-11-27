@@ -8,6 +8,7 @@ use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
+use Illuminate\Validation\ValidationException;
 
 class AuthenticatedSessionController extends Controller
 {
@@ -25,13 +26,19 @@ class AuthenticatedSessionController extends Controller
     public function store(LoginRequest $request): RedirectResponse
     {
         $request->authenticate();
-        $user = $request->user();
 
-        //dd($user->rol->privilegios);
-        
+        if ($request->user()->state !== 'a') {
+            Auth::guard('web')->logout();
+
+            $request->session()->invalidate();
+            $request->session()->regenerateToken();
+
+            throw ValidationException::withMessages([
+                'email' => 'Tu cuenta se encuentra inactiva. Contacta al administrador.',
+            ]);
+        }
+
         $request->session()->regenerate();
-
-        //$privilegios->
 
         return redirect()->intended(route('dashboard', absolute: false));
     }
