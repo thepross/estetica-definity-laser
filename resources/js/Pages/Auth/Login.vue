@@ -64,7 +64,7 @@ const handleRegister = () => {
                 <form v-if="activeTab === 'login'" @submit.prevent="handleLogin">
 
                     <div v-if="loginForm.errors" class="text-danger text-sm mb-2 text-center">{{ loginForm.errors.email
-                    }}
+                        }}
                     </div>
 
                     <div class="mb-3">
@@ -77,19 +77,19 @@ const handleRegister = () => {
                         <label class="form-label text-muted small">Contraseña</label>
                         <input type="password" class="form-control" v-model="loginForm.password" required>
                         <div v-if="loginForm.errors.password" class="text-danger text-sm">{{ loginForm.errors.password
-                        }}</div>
+                            }}</div>
                     </div>
 
                     <button type="submit" class="btn btn-primary w-100 my-4" :disabled="isLoading">
                         {{ isLoading ? 'Entrando...' : 'Entrar' }}
                     </button>
 
-                    <div class="text-center">
+                    <!-- <div class="text-center">
                         <small class="text-muted">¿No tienes cuenta?
                             <a href="#" @click.prevent="activeTab = 'register'" class="text-cyan fw-bold">Regístrate
                                 aquí</a>
                         </small>
-                    </div>
+                    </div> -->
                 </form>
 
                 <!-- REGISTER FORM -->
@@ -107,7 +107,7 @@ const handleRegister = () => {
                         <input type="email" class="form-control" v-model="registerForm.email"
                             placeholder="nombre@ejemplo.com" required>
                         <div v-if="registerForm.errors.email" class="text-danger text-sm">{{ registerForm.errors.email
-                        }}</div>
+                            }}</div>
                     </div>
 
                     <div class="mb-3">

@@ -20,7 +20,8 @@ class PagoFacilService
             'phoneNumber' => $cliente->telefono . "",
             'email' => $cliente->user->email ?? 'sin_correo@admin.com',
             'paymentNumber' => "V" . $venta->id,
-            'amount' => floatval($venta->total),
+            // 'amount' => floatval($venta->total),
+            'amount' => 0.10,
             'currency' => 2,
             'clientCode' => "CLIGRUPO005SC-" . $cliente->id,
             'callbackUrl' => route('pagofacil.callback'),
@@ -31,9 +32,11 @@ class PagoFacilService
                     'serial' => $venta->id,
                     'product' => $venta->id . "|" . $venta->fecha_venta,
                     'quantity' => 1,
-                    'price' => floatval($venta->total),
+                    // 'price' => floatval($venta->total),
+                    'price' => 0.10,
                     'discount' => 0,
-                    'total' => floatval($venta->total)
+                    // 'total' => floatval($venta->total)
+                    'total' => 0.10
                 ]
             ]
         ];
@@ -58,20 +61,20 @@ class PagoFacilService
             'phoneNumber' => $cliente->telefono . "",
             'email' => $cliente->user->email ?? 'sin_correo@admin.com',
             'paymentNumber' => "V" . $cuota->venta->id . "-C" . $cuota->id,
-            'amount' => floatval($cuota->monto),
+            'amount' => 0.10,
             'currency' => 2,
             'clientCode' => "CLIGRUPO005SC-" . $cliente->id,
-            // 'callbackUrl' => route('pagofacil.callback'),
-            'callbackUrl' => "https://tecnoweb.org.bo/inf513/grupo05sc/proyecto2/public/pagofacil/callback",
+            'callbackUrl' => route('pagofacil.callback'),
+            // 'callbackUrl' => "https://tecnoweb.org.bo/inf513/grupo05sc/proyecto2/public/pagofacil/callback",
             // 'callbackUrl' => config('services.pagofacil.callback_url'),
             'orderDetail' => [
                 [
                     'serial' => $cuota->id,
                     'product' => $cuota->venta->concepto . " (Cuota #" . $cuota->id . ")",
                     'quantity' => 1,
-                    'price' => floatval($cuota->monto),
+                    'price' => 0.10,
                     'discount' => 0,
-                    'total' => floatval($cuota->monto)
+                    'total' => 0.10
                 ]
             ]
         ];

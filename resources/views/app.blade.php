@@ -86,17 +86,17 @@
     <script src="https://cdn.datatables.net/1.13.4/js/jquery.dataTables.min.js"></script>
     <script src="https://cdn.datatables.net/1.13.4/js/dataTables.bootstrap5.min.js"></script>
     <script>
-        $('#usuarios').DataTable();
-        $('#categorias').DataTable();
-        $('#clientes').DataTable();
-        $('#pagos').DataTable();
-        $('#privilegios').DataTable();
-        $('#productos').DataTable();
-        $('#promociones').DataTable();
-        $('#roles').DataTable();
-        $('#servicios').DataTable();
-        $('#ventas').DataTable();
-        $('#citas').DataTable();
+        // $('#usuarios').DataTable();
+        // $('#categorias').DataTable();
+        // $('#clientes').DataTable();
+        // $('#pagos').DataTable();
+        // $('#privilegios').DataTable();
+        // $('#productos').DataTable();
+        // $('#promociones').DataTable();
+        // $('#roles').DataTable();
+        // $('#servicios').DataTable();
+        // $('#ventas').DataTable();
+        // $('#citas').DataTable();
     </script>
 
 </body>

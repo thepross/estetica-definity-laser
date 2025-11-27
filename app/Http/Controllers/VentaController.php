@@ -26,15 +26,28 @@ class VentaController extends Controller
         $contar = new Contador();
         $num = $contar->contarModel(12);
 
-        $ventas = Venta::with(['cliente', 'usuario', 'detalles.producto', 'detalles.servicio', 'planes.cuotas', 'pagos'])
+        $user = Auth::user();
+        $rol = $user->rol->nombre;
+
+        $query = Venta::with(['cliente', 'usuario', 'detalles.producto', 'detalles.servicio', 'planes.cuotas', 'pagos'])
             ->where('state', 'a')
-            ->orderBy('id', 'asc')
-            ->get();
+            ->orderBy('id', 'asc');
+
+        if ($rol === 'Cliente') {
+            if ($user->cliente) {
+                $query->where('id_cliente', $user->cliente->id);
+            } else {
+                $query->where('id', -1);
+            }
+        } elseif ($rol === 'Secretaria') {
+            $query->where('id_usuario', $user->id);
+        }
+
+        $ventas = $query->get();
 
         $clientes = Cliente::where('state', 'a')->get();
         $productos = Producto::where('state', 'a')->get();
         $servicios = Servicio::where('state', 'a')->get();
-        // dd($ventas);
 
         return Inertia::render('Venta/Index', [
             'ventas' => $ventas,
@@ -48,9 +61,7 @@ class VentaController extends Controller
     /**
      * Show the form for creating a new resource.
      */
-    public function create()
-    {
-    }
+    public function create() {}
 
     /**
      * Store a newly created resource in storage.

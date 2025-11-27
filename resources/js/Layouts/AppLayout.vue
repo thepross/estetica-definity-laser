@@ -17,6 +17,7 @@ const can = (funcionalidad) => {
   return page.props.auth.privilegios?.[funcionalidad]?.leer;
 }
 
+const isCliente = computed(() => user.value?.rol?.nombre === 'Cliente');
 
 const isAdmin = computed(() => role.value === 'admin')
 const isMedico = computed(() => role.value === 'medico')
@@ -233,6 +234,18 @@ const logout = () => {
       <div class="sidebar">
         <nav class="mt-2">
           <ul class="nav nav-pills nav-sidebar flex-column" data-widget="treeview" role="menu" data-accordion="false">
+            <li class="nav-item" v-if="isCliente && can('Venta')">
+              <Link :href="route('venta.index')" class="nav-link">
+              <i class="fas fa-shopping-cart nav-icon mr-2"></i>
+              <p>Mis ventas</p>
+              </Link>
+            </li>
+            <li class="nav-item" v-if="isCliente && can('Cita')">
+              <Link :href="route('cita.index')" class="nav-link">
+              <i class="fas fa-calendar nav-icon mr-2"></i>
+              <p>Mis citas</p>
+              </Link>
+            </li>
 
             <li class="nav-item" v-if="can('Administracion') || can('Usuario') || can('Rol') || can('Privilegio')">
               <a href="#" class="nav-link">
@@ -285,7 +298,7 @@ const logout = () => {
                   <p>Clientes</p>
                   </Link>
                 </li>
-                <li class="nav-item">
+                <li class="nav-item" v-if="can('Cita')">
                   <Link :href="route('cita.index')" class="nav-link">
                   <i class="far fa-circle nav-icon"></i>
                   <p>Citas</p>

@@ -23,18 +23,25 @@ class CitasController extends Controller
         $authUser = auth()->user();
         // dd($authUser);
 
-        if ($authUser->rol->nombre == 'Administrador' || $authUser->rol->nombre == 'Secretaria') {
-            $citas = Cita::with(['cliente', 'medico', 'secretaria', 'servicio'])
-                ->activas()->orderBy('id', 'desc')->get();
-        } else {
-            $citas = Cita::with(['cliente', 'medico', 'secretaria', 'servicio'])
-                ->where(
-                    'id_medico',
-                    $authUser->id
-                )
-                ->activas()->orderBy('id', 'desc')->get();
+        $rol = $authUser->rol->nombre;
 
+        $query = Cita::with(['cliente', 'medico', 'secretaria', 'servicio'])
+            ->activas()
+            ->orderBy('id', 'desc');
+
+        if ($rol === 'Medico') {
+            $query->where('id_medico', $authUser->id);
+        } elseif ($rol === 'Secretaria') {
+            $query->where('id_secretaria', $authUser->id);
+        } elseif ($rol === 'Cliente') {
+            if ($authUser->cliente) {
+                $query->where('id_cliente', $authUser->cliente->id);
+            } else {
+                $query->where('id', -1);
+            }
         }
+
+        $citas = $query->get();
         // dd($citas);
         $clientes = Cliente::where('state', 'a')->get();
         $medicos = Usuario::whereHas('rol', function ($q) {
@@ -45,7 +52,6 @@ class CitasController extends Controller
         })->where('state', 'a')->get();
         $servicios = Servicio::where('state', 'a')->get();
 
-        // return view('Cita.index', compact('citas', 'clientes', 'medicos', 'secretarias', 'servicios'));
         return Inertia::render('Cita/Index', [
             'citas' => $citas,
             'clientes' => $clientes,

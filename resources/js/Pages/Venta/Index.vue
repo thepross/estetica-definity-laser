@@ -1,6 +1,6 @@
 <script setup>
 import { ref, computed, onMounted, onUnmounted } from "vue";
-import { usePage, router } from "@inertiajs/vue3";
+import { usePage, router, Head } from "@inertiajs/vue3";
 import AppLayout from "@/Layouts/AppLayout.vue";
 import RegistrarPagoModal from "./RegistrarPago.vue";
 import PlanPagoModal from "./PlanPago.vue";
@@ -36,6 +36,7 @@ function hasPlan(ventaId) {
 const canAdd = computed(() => hasPermission("agregar"));
 const canEdit = computed(() => hasPermission("modificar"));
 const canDelete = computed(() => hasPermission("borrar"));
+const isCliente = computed(() => user.value?.rol?.nombre === 'Cliente');
 
 const showCreate = ref(false);
 const verDetalles = ref(null);
@@ -68,7 +69,9 @@ onUnmounted(() => {
 </script>
 
 <template>
-    <AppLayout title="G. Ventas">
+
+    <Head title="G. Ventas" />
+    <AppLayout>
         <section class="content" v-if="can('Venta')">
             <div class="card-header d-flex justify-content-between align-items-center">
                 <h1 class="card-title mb-0"><i class="fas fa-clock mr-2"></i><b>GESTIONAR VENTAS</b></h1>
@@ -106,16 +109,19 @@ onUnmounted(() => {
                                         @click.prevent="verDetalles = venta">Ver
                                         Detalles
                                     </button>
-                                    <button class="btn btn-success btn-sm" href="#"
-                                        :disabled="venta.estado === 'pagado'"
-                                        @click.prevent="registrarPago = venta">Registrar Pago
-                                    </button>
-                                    <button class="btn btn-warning btn-sm" href="#" @click.prevent="planPago = venta"
-                                        :disabled="!hasPlan(venta.id)">Plan de Pago
-                                    </button>
-                                    <button class="btn btn-danger btn-sm" href="#"
-                                        @click.prevent="ventaToDelete = venta"><i class="fa fa-trash"></i>
-                                    </button>
+                                    <template v-if="!isCliente">
+                                        <button class="btn btn-success btn-sm" href="#"
+                                            :disabled="venta.estado === 'pagado'"
+                                            @click.prevent="registrarPago = venta">Registrar Pago
+                                        </button>
+                                        <button class="btn btn-warning btn-sm" href="#"
+                                            @click.prevent="planPago = venta" :disabled="!hasPlan(venta.id)">Plan de
+                                            Pago
+                                        </button>
+                                        <button class="btn btn-danger btn-sm" href="#"
+                                            @click.prevent="ventaToDelete = venta"><i class="fa fa-trash"></i>
+                                        </button>
+                                    </template>
                                 </td>
                             </tr>
                         </tbody>
